@@ -56,7 +56,7 @@ class MainWindow(FramelessMainWindow):
         # put the window Location center in screen
         self.center()
 
-        self.setStyleSheet(open("./src/styles/style.qss", "r").read())
+        self.setStyleSheet(open(".\styles\style.qss", "r").read())
         
         self.window_font = QFont("FiraCode", 12)
         self.setFont(self.window_font)
