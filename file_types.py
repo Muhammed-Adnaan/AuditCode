@@ -4,6 +4,8 @@ class FileType(Enum):
     Python = auto()
     Json = auto()
     Toml = auto()
+    C = auto()
+    Java = auto()
     Other = auto()
 
 def generate_file_mapping(file_type_extensions):
@@ -17,6 +19,8 @@ file_type_extensions = {
     FileType.Python: [".py", ".pyw"],
     FileType.Json: [".json", ".ipynb"],
     FileType.Toml: [".toml"],
+    FileType.C: [".c", ".h"],
+    FileType.Java: [".java"],
     FileType.Other: [".txt"],
 }
 

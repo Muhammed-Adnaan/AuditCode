@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from pathlib import Path
-from PyQt5.Qsci import QsciScintilla, QsciAPIs
+from PyQt5.Qsci import QsciScintilla, QsciAPIs,QsciLexer
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QColor, QKeyEvent
 
@@ -104,11 +104,24 @@ class Editor(QsciScintilla):
             self.setLexer(self.jsonlexer)
         else:
             # self.lexer = QsciLexer()
-            self.setPaper(QColor("#282c34"))
-            self.setColor(QColor("#abb2bf"))
+            # self.setPaper(QColor("#282c34"))
+            # self.setColor(QColor("#abb2bf"))
             # self.lexer.setDefaultColor("#abb2bf")
             # self.lexer.setDefaultFont(QFont("Consolas", 14))
             # self.setLexer(self.lexer)
+            self.pylexer = PyCustomLexer(self)
+            # QsciLexerPython
+            self.pylexer.setDefaultFont(self.font)
+
+            # Api AUTOCOMPLETION
+            # API
+            self.__api = QsciAPIs(self.pylexer)
+            # autocompletion_image = QPixmap("./src/icons/close-icon.svg")
+            # self.registerImage(1, autocompletion_image)
+
+            self.auto_completer = AutoCompleter(self.full_path, self.__api)
+            self.auto_completer.finished.connect(self.loaded_autocomp)
+            self.setLexer(self.pylexer)
 
         # style
         self.setIndentationGuidesBackgroundColor(QColor("#dedcdc"))
