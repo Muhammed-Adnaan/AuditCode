@@ -23,10 +23,8 @@ from heading import Heading
 
 from qframelesswindow import FramelessMainWindow
 import ollama 
-import resources
 
 import threading
-import requests
 import sys
 import os
 from pathlib import Path
@@ -284,9 +282,9 @@ class MainWindow(FramelessMainWindow):
         self.chat_input.returnPressed.connect(self.process_chat_input)  # Connect to the processing function
 
         ################### CHECKBOX #####################
-        self.chat_checkbox = QCheckBox("Chat With Modules")
-        self.chat_checkbox.setFont(self.window_font)
-        self.chat_checkbox.setStyleSheet("color: white; margin-bottom: 10px;")
+        # self.chat_checkbox = QCheckBox("Chat With Modules")
+        # self.chat_checkbox.setFont(self.window_font)
+        # self.chat_checkbox.setStyleSheet("color: white; margin-bottom: 10px;")
 
         ###################################################
         ############## Chat ListView #####################
@@ -295,7 +293,7 @@ class MainWindow(FramelessMainWindow):
 
         # self.chat_list_view.itemClicked.connect(self.search_list_view_clicked)
 
-        chat_layout.addWidget(self.chat_checkbox)
+        # chat_layout.addWidget(self.chat_checkbox)
         chat_layout.addWidget(self.chat_input)
         chat_layout.addSpacerItem(
             QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -306,10 +304,10 @@ class MainWindow(FramelessMainWindow):
         ####################################################
         ############## SideBar Icons #######################
         folder_label = self.get_sidebar_button(
-            ":/icons/folder_icon.svg", self.file_manager_frame
+            "icons/folder_icon.svg", self.file_manager_frame
         )
         side_bar_content.addWidget(folder_label)
-        search_label = self.get_sidebar_button(":/icons/search_icon.svg", self.search_frame)
+        search_label = self.get_sidebar_button("icons/search_icon.svg", self.search_frame)
         side_bar_content.addWidget(search_label)
 
         
