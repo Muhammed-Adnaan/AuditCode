@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QSplitter,
     QVBoxLayout,
+    QComboBox,
     QTabWidget,
     QLineEdit, QCheckBox, QLabel,
     QListWidget,
@@ -21,8 +22,11 @@ from fuzzy_searcher import SearchItem, SearchWorker
 from heading import Heading
 
 from qframelesswindow import FramelessMainWindow
+import ollama 
 import resources
 
+import threading
+import requests
 import sys
 import os
 from pathlib import Path
@@ -39,7 +43,8 @@ class MainWindow(FramelessMainWindow):
         self.current_side_bar = None
         self.envs = list(jedi.find_virtualenvs())
         self.init_ui()
-		
+        self.conversation_history = []
+        # self.header = Heading(self)		
     @property
     def current_file(self) -> Path:
         return self._current_file
@@ -259,6 +264,44 @@ class MainWindow(FramelessMainWindow):
         search_layout.addWidget(self.search_list_view)
         self.search_frame.setLayout(search_layout)
 
+        ###############################################
+        ############## Chat View ######################
+
+        # layout for search view
+        self.chat_frame = self.get_frame()
+        self.chat_frame.setMaximumWidth(400)
+        self.chat_frame.setMinimumWidth(200)
+        chat_layout = QVBoxLayout()
+        chat_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        chat_layout.setContentsMargins(0, 10, 0, 0)
+        chat_layout.setSpacing(0)
+        
+        # Chat Input Field
+        self.chat_input = QLineEdit()
+        self.chat_input.setPlaceholderText("chat")
+        self.chat_input.setFont(self.window_font)
+        self.chat_input.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.chat_input.returnPressed.connect(self.process_chat_input)  # Connect to the processing function
+
+        ################### CHECKBOX #####################
+        self.chat_checkbox = QCheckBox("Chat With Modules")
+        self.chat_checkbox.setFont(self.window_font)
+        self.chat_checkbox.setStyleSheet("color: white; margin-bottom: 10px;")
+
+        ###################################################
+        ############## Chat ListView #####################
+        self.chat_list_view = QListWidget()
+        self.chat_list_view.setFont(QFont("FiraCode", 13))
+
+        # self.chat_list_view.itemClicked.connect(self.search_list_view_clicked)
+
+        chat_layout.addWidget(self.chat_checkbox)
+        chat_layout.addWidget(self.chat_input)
+        chat_layout.addSpacerItem(
+            QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        )
+        chat_layout.addWidget(self.chat_list_view)
+        self.chat_frame.setLayout(chat_layout)
     
         ####################################################
         ############## SideBar Icons #######################
@@ -269,6 +312,12 @@ class MainWindow(FramelessMainWindow):
         search_label = self.get_sidebar_button(":/icons/search_icon.svg", self.search_frame)
         side_bar_content.addWidget(search_label)
 
+        
+        # chat_label = self.get_sidebar_button(":/icons/search_icon.svg", self.chat_frame)
+        chat_label = self.get_sidebar_button("icons/chat_icon.svg", self.chat_frame)
+        side_bar_content.addWidget(chat_label)
+
+    
         self.side_bar.setLayout(side_bar_content)
         body.addWidget(self.side_bar)
 
@@ -364,6 +413,99 @@ class MainWindow(FramelessMainWindow):
         """
         
         self.centralWidget().setStyleSheet(self.frame_stlye)
+
+    def process_chat_input(self):
+        """Handle the chat input and generate a response."""
+        user_input = self.chat_input.text()
+        if not user_input.strip():
+            return
+
+        # Clear input field
+        self.chat_input.clear()
+
+        # Display user input in the chat view
+        self.chat_list_view.addItem(f"You: {user_input}")
+
+        # Create a thread to handle the AI response generation
+        thread = threading.Thread(target=self.handle_ai_response, args=(user_input,))
+        thread.start()
+    def handle_ai_response(self, user_input):
+        """Fetch and display the AI response in a separate thread."""
+        ai_response = self.generate_ai_response(user_input)
+        # Update the chat list view with the AI response (must run on the main thread)
+        self.chat_list_view.addItem(f"AI: {ai_response}")
+        print(ai_response)
+
+        ##code with conversation history
+    def generate_ai_response(self, input_text, model="llama3.2", max_history_length=10):
+        
+        
+        try:
+            # Add user message to conversation history
+            self.conversation_history.append({
+                "role": "user",
+                "content": input_text
+            })
+
+            # Trim conversation history if it exceeds max length
+            if len(self.conversation_history) > max_history_length:
+                # Remove oldest messages, keeping the most recent ones
+                self.conversation_history = self.conversation_history[-max_history_length:]
+
+            # Generate response using Ollama with conversation history
+            response = ollama.chat(
+                model=model,
+                messages=self.conversation_history
+            )
+            
+            # Extract AI response
+            ai_response = response.get("message", {}).get("content", "Sorry, I couldn't process that.")
+            
+            # Add AI response to conversation history
+            self.conversation_history.append({
+                "role": "assistant",
+                "content": ai_response
+            })
+
+            return ai_response
+
+        except Exception as e:
+            # Handle any errors
+            return f"Error: {e}"
+
+    def get_conversation_history(self):
+        """
+        Retrieve the current conversation history
+        
+        :return: List of conversation messages
+        """
+        return self.conversation_history
+
+    def clear_conversation_history(self):
+        """
+        Clear the entire conversation history
+        """
+        self.conversation_history = []
+###code acctuly running 
+    # def generate_ai_response(self, input_text):
+    #     """Generate a response using the Ollama library."""
+    #     print(input_text)
+    #     try:
+    #         # Wrap the input text in a list of dictionaries
+    #         messages = [
+    #             {
+    #                 "role": "user",
+    #                 "content": input_text
+    #             }
+    #         ]
+            
+    #         response = ollama.chat(model="llama3.2", messages=messages)
+    #         return response.get("message", {}).get("content", "Sorry, I couldn't process that.")
+    #     except Exception as e:
+    #         return f"Error: {e}"
+
+
+
 
     def search_finished(self, items):
         self.search_list_view.clear()
@@ -560,4 +702,6 @@ if __name__ == "__main__":
 
     window = MainWindow()
     app.installEventFilter(window.header)
+
+
     sys.exit(app.exec_())

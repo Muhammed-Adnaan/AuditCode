@@ -3,5 +3,6 @@
     <file>close-icon.svg</file>
     <file>folder_icon.svg</file>
     <file>search_icon.svg</file>
+    <file>chat_icon.svg</file>
 </qresource>
 </RCC>
