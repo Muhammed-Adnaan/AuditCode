@@ -36,7 +36,7 @@ QTabBar::tab:selected {
 }
 
 QTabBar::close-button {
-    image: url(:/icons/close-icon.svg);
+    image: url(./icons/close-icon.svg);
 }
 
 

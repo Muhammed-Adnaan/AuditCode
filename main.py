@@ -536,7 +536,7 @@ class MainWindow(FramelessMainWindow):
         dialog.setFont(self.font())
         dialog.font().setPointSize(14)
         dialog.setWindowTitle(title)
-        dialog.setWindowIcon(QIcon(":/icons/close-icon.svg"))
+        dialog.setWindowIcon(QIcon("./icons/close-icon.svg"))
         dialog.setText(msg)
         dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         dialog.setDefaultButton(QMessageBox.No)
