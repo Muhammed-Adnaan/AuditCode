@@ -81,7 +81,6 @@ class MainWindow(FramelessMainWindow):
         venv = None
         if len(self.envs) > 0:
             venv = self.envs[0]
-        # UPDATED EP 9
         editor = Editor(self, path=path, env=venv, file_type=file_type)
         return editor
 
@@ -185,7 +184,7 @@ class MainWindow(FramelessMainWindow):
         side_bar_content.setContentsMargins(5, 10, 5, 0)
         side_bar_content.setAlignment(Qt.AlignTop | Qt.AlignCenter)
 
-        # UPDATED EP 8
+
         ###############################################
         ############ File Manager ###############
 
@@ -341,14 +340,14 @@ class MainWindow(FramelessMainWindow):
 
 
         wlcm_title = self.create_label(
-            "Welcome to Aduitcode!",
+            "Welcome to Auditcode!",
             "color: #84878B;",
             Qt.AlignmentFlag.AlignHCenter,
             font_size=25,
             min_height=90,
         )
         wlcm_msg = self.create_label(
-            "This is a simple code editor.\nYou can create new files or open existing ones.",
+            "This is a simple code editor.\nYou can create new files or open existing ones.\n Muhammed Adnaan 4HG21CS026 Sinchana C V 4HG21CS045 \nK R Archana 4HG22CS403 Megha N N 4HG22CS406",
             "color: #84878B;",
             Qt.AlignmentFlag.AlignHCenter,
             font_size=15,
@@ -517,7 +516,7 @@ class MainWindow(FramelessMainWindow):
         editor.setFocus()
 
     def show_hide_tab(self, e: QMouseEvent, widget: str):
-        # NEW EPISODE 8 
+
         if self.current_side_bar == widget:
             if widget.isHidden():
                 widget.show()
@@ -530,7 +529,7 @@ class MainWindow(FramelessMainWindow):
         self.current_side_bar = widget
         self.current_side_bar.show()
 
-    # UPDATED EP 9
+
     def show_dialog(self, title, msg) -> int:
         dialog = QMessageBox(self)
         dialog.setFont(self.font())
@@ -556,7 +555,6 @@ class MainWindow(FramelessMainWindow):
         self.tab_view.removeTab(index)
 
     def tab_changed(self, index: int):
-        # NEW EPISODE 8 
         editor = self.tab_view.widget(index)
         if editor:
             self.current_file = editor.path
@@ -583,7 +581,7 @@ class MainWindow(FramelessMainWindow):
             t.copy()
 
     def set_new_tab(self, path: Path, is_new_file=False):
-        # UPDATED EP 9
+
         if not is_new_file and self.is_binary(path):
             self.statusBar().showMessage("Cannot Open Binary File", 2000)
             return
@@ -608,7 +606,7 @@ class MainWindow(FramelessMainWindow):
 
         # check if file is already open
         for i in range(self.tab_view.count()):
-            # UPDATED EP 9
+
             if self.tab_view.tabText(i) == path.name or self.tab_view.tabText(i) == "*"+path.name: # check for unsaved state too
                 # set the active tab to that
                 self.tab_view.setCurrentIndex(i)
@@ -628,8 +626,7 @@ class MainWindow(FramelessMainWindow):
         self.set_new_tab(Path("untitled"), True)
 
     def save_file(self):
-        # UPDATED EP 8
-        # save file
+
         if self.current_file is None and self.tab_view.count() > 0:
             self.save_as()
             return
@@ -640,12 +637,11 @@ class MainWindow(FramelessMainWindow):
         text_edit = self.tab_view.currentWidget()
         self.current_file.write_text(text_edit.text())
         self.statusBar().showMessage(f"Saved {self.current_file.name}", 2000)
-        # UPDATED EP 9
+
         text_edit.current_file_changed = False
 
     def save_as(self):
-        # save as
-        # UPDATED EP 8
+
         text_edit = self.tab_view.currentWidget()
         if text_edit is None:
             return
