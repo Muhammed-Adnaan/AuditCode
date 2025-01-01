@@ -1,4 +1,4 @@
-# AduitCode
+# AuditCode
 
 This is a simple code editor.<br/>
 You can create new files or open existing ones.
